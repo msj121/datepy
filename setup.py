@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='dateconverter',
+    name='pydate',
     version='0.1.0',
     description='A robust utility for parsing dates in various formats.',
     author='msj121',
