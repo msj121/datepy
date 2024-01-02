@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from dateutil import parser
 import re
 
@@ -38,7 +38,7 @@ DATE_FORMATS = {
 
 def remove_days_of_week(date_str):
     # Compiled regex pattern for efficiency
-    days_pattern = re.compile(r'\b(?:Mon|Tues|Wed|Thurs|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[, ]?\b', re.IGNORECASE)
+    days_pattern = re.compile(r'\b(?:Mon|Tues|Wed|Thur|Thurs|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[, ]?\b', re.IGNORECASE)
     
     # Remove the day of the week from the date string
     return days_pattern.sub("", date_str).strip()
@@ -49,7 +49,9 @@ def remove_days_of_week(date_str):
 
 def convert_to_rfc3339(date_str, debug=False):
     # Try parsing with standard formats.
-
+    if date_str is None:
+        return None
+    
     new_date_str = remove_days_of_week(date_str)
     if(new_date_str != date_str):
         if(debug):
@@ -89,6 +91,7 @@ def convert_to_rfc3339(date_str, debug=False):
 def main():
     # Example usage with a list of date strings.
     date_formats = [
+        "Thur, 2 Dec 2017 1:00:00 GMT",        # RFC 822 with timezone
         "Tues, 04 June 2013 15:00:00 +0900",    # RFC 822 with timezone
         "2024-01-01T12:00:00Z",                 # ISO 8601 with UTC timezone
         "2024-01-01T12:00:00+00:00",           # ISO 8601 with UTC offset
@@ -126,7 +129,13 @@ def main():
     ]
     converted_dates = [convert_to_rfc3339(date, debug=True) for date in date_formats]
     for date in converted_dates:
-        print(date)
+        try:
+            date = parser.parse(date)
+            if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
+                    date = date.replace(tzinfo=timezone.utc)
+            print(date)
+        except ValueError:
+            print(date)
 
 if __name__ == "__main__":
     main()
