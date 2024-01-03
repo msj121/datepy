@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from dateutil import parser
+import dateparser  # Import the dateparser library
 import re
 
 # Dictionary of standard and custom date formats.
@@ -62,6 +63,7 @@ def convert_to_rfc3339(date_str, debug=False):
         return parser.parse(date_str).isoformat()
     except ValueError:
         pass
+
     # return None
     for fmt in DATE_FORMATS['standard']:
         try:
@@ -84,6 +86,13 @@ def convert_to_rfc3339(date_str, debug=False):
         except ValueError:
             pass
     
+    try:
+        parsed_date = dateparser.parse(date_str)
+        if parsed_date:
+            return parsed_date.isoformat()
+    except ValueError:
+        pass
+
     if(debug):
         return (f"Could not parse the date: {date_str}")
     return None
@@ -91,6 +100,7 @@ def convert_to_rfc3339(date_str, debug=False):
 def main():
     # Example usage with a list of date strings.
     date_formats = [
+        "Fri, 22 Mer 2019 10:00:00 +0900",     # RFC 822 with timezone
         "Thur, 2 Dec 2017 1:00:00 GMT",        # RFC 822 with timezone
         "Tues, 04 June 2013 15:00:00 +0900",    # RFC 822 with timezone
         "2024-01-01T12:00:00Z",                 # ISO 8601 with UTC timezone
