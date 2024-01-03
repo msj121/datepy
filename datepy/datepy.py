@@ -42,7 +42,53 @@ def remove_days_of_week(date_str):
     days_pattern = re.compile(r'\b(?:Mon|Tues|Wed|Thur|Thurs|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[, ]?\b', re.IGNORECASE)
     
     # Remove the day of the week from the date string
-    return days_pattern.sub("", date_str).strip()
+    toreturn = days_pattern.sub("", date_str).strip()
+
+    # Remove the comma if it's at the end of the string
+    if toreturn[-1] == "," or toreturn[-1] == ".":
+        toreturn = toreturn[:-1].strip()
+    if toreturn[0] == "," or toreturn[0] == ".":
+        toreturn = toreturn[1:].strip()
+    return toreturn
+
+def changeMonthsToLongForm(date_str):
+    # if date_str has jun and not june, change to june
+    # if date_str has jan and not january, change to january
+    # etc
+    date_str = date_str.strip().lower()
+    months = ["january", "february", "march", "april", "may", "june", "july",
+                "august", "september", "october", "november", "december"]
+    for month in months:
+        if not month in date_str and month[:3] in date_str:
+            date_str = date_str.replace(month[:3], month)
+
+    return date_str
+
+    # if "jan" in date_str.lower() and "january" not in date_str.lower():
+    #     date_str = date_str.replace("jan", "january")
+    # if "feb" in date_str.lower() and "february" not in date_str.lower():
+    #     date_str = date_str.replace("feb", "february")
+    # if "mar" in date_str.lower() and "march" not in date_str.lower():
+    #     date_str = date_str.replace("mar", "march")
+    # if "apr" in date_str.lower() and "april" not in date_str.lower():
+    #     date_str = date_str.replace("apr", "april")
+    # if "may" in date_str.lower() and "may" not in date_str.lower():
+    #     date_str = date_str.replace("may", "may")
+    # if "jun" in date_str.lower() and "june" not in date_str.lower():
+    #     date_str = date_str.replace("jun", "june")
+    # if "jul" in date_str.lower() and "july" not in date_str.lower():
+    #     date_str = date_str.replace("jul", "july")
+    # if "aug" in date_str.lower() and "august" not in date_str.lower():
+    #     date_str = date_str.replace("aug", "august")
+    # if "sep" in date_str.lower() and "september" not in date_str.lower():
+    #     date_str = date_str.replace("sep", "september")
+    # if "oct" in date_str.lower() and "october" not in date_str.lower():
+    #     date_str = date_str.replace("oct", "october")
+    # if "nov" in date_str.lower() and "november" not in date_str.lower():
+    #     date_str = date_str.replace("nov", "november")
+    # if "dec" in date_str.lower() and "december" not in date_str.lower():
+    #     date_str = date_str.replace("dec", "december")
+    return date_str
 
 
 
@@ -56,8 +102,13 @@ def convert_to_rfc3339(date_str, debug=False):
     new_date_str = remove_days_of_week(date_str)
     if(new_date_str != date_str):
         if(debug):
-            print(f"Removed days of week: {date_str}")
+            print(f"Removed days of week: {date_str} --> {new_date_str}")
         date_str = new_date_str
+    # new_date_str = changeMonthsToLongForm(date_str)
+    # if(new_date_str != date_str):
+    #     if(debug):
+    #         print(f"Changed months to long form: {date_str} --> {new_date_str}")
+    #     date_str = new_date_str
 
     try:
         return parser.parse(date_str).isoformat()
@@ -100,6 +151,7 @@ def convert_to_rfc3339(date_str, debug=False):
 def main():
     # Example usage with a list of date strings.
     date_formats = [
+        "Sat, 18 Jun 2016 12:00:00 +0800",     # RFC 822 with timezone
         "Fri, 22 Mer 2019 10:00:00 +0900",     # RFC 822 with timezone
         "Thur, 2 Dec 2017 1:00:00 GMT",        # RFC 822 with timezone
         "Tues, 04 June 2013 15:00:00 +0900",    # RFC 822 with timezone
