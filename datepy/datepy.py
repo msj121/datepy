@@ -41,7 +41,7 @@ DATE_FORMATS = {
 
 def remove_days_of_week(date_str):
     # Compiled regex pattern for efficiency
-    days_pattern = re.compile(r'\b(?:Mon|Mond|Tues|Tue|Wed|Thu|Thur|Thurs|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[, ]?\b', re.IGNORECASE)
+    days_pattern = re.compile(r'\b(?:Mon|Mond|Tues|Tue|Wed|Wen|Thu|Thur|Thurs|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[, ]?\b', re.IGNORECASE)
     
     # Remove the day of the week from the date string
     toreturn = days_pattern.sub("", date_str).strip()
