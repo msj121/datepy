@@ -114,21 +114,21 @@ def convert_to_rfc3339(date_str, debug=False):
 
     try:
         return parser.parse(date_str).isoformat()
-    except ValueError:
+    except Exception:
         pass
 
     # return None
     for fmt in DATE_FORMATS['standard']:
         try:
             return datetime.strptime(date_str, fmt).isoformat()
-        except ValueError:
+        except Exception:
             continue
 
     # Try parsing with custom formats.
     for fmt in DATE_FORMATS['custom'].values():
         try:
             return datetime.strptime(date_str, fmt).isoformat()
-        except ValueError:
+        except Exception:
             continue
 
     # Handle ambiguous year formats.
@@ -136,21 +136,21 @@ def convert_to_rfc3339(date_str, debug=False):
         try:
             date_str = re.sub(r'[^\d]', '', date_str)
             return datetime.strptime(date_str, "%y%m%d").isoformat()
-        except ValueError:
+        except Exception:
             pass
     
     try:
         parsed_date = dateparser.parse(date_str)
         if parsed_date:
             return parsed_date.isoformat()
-    except ValueError:
+    except Exception:
         pass
     
     try:
         return datetime.fromtimestamp(mktime_tz(parsedate_tz(date_str))).isoformat()
-    except ValueError:
+    except Exception:
         pass
-    
+
     if(debug):
         return (f"Could not parse the date: {date_str}")
     return None
@@ -159,6 +159,7 @@ def main():
     # Example usage with a list of date strings.
     date_formats = [
         # "Tue, 01 Dic 2020 00:02:00 GMT",        # RFC 822 with timezone
+        "Wen, 16 fev 2007 12:00:00 +0200",
         "Sun, 4 Sep 2016 00:00:00 -0700 GMT",
         "Tue, 19 Feb 2019 24:00:00 PST",       # RFC 822 with timezone
         "Sat, 18 Jun 2016 12:00:00 +0800",     # RFC 822 with timezone
