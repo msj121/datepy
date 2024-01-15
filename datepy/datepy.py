@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 from dateutil import parser
 import dateparser  # Import the dateparser library
 import re
+from email.utils import parsedate_tz, mktime_tz
+
 
 # Dictionary of standard and custom date formats.
 DATE_FORMATS = {
@@ -39,15 +41,15 @@ DATE_FORMATS = {
 
 def remove_days_of_week(date_str):
     # Compiled regex pattern for efficiency
-    days_pattern = re.compile(r'\b(?:Mon|Tues|Wed|Thur|Thurs|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[, ]?\b', re.IGNORECASE)
+    days_pattern = re.compile(r'\b(?:Mon|Mond|Tues|Tue|Wed|Thu|Thur|Thurs|Fri|Sat|Sun|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[, ]?\b', re.IGNORECASE)
     
     # Remove the day of the week from the date string
     toreturn = days_pattern.sub("", date_str).strip()
 
     # Remove the comma if it's at the end of the string
-    if toreturn[-1] == "," or toreturn[-1] == ".":
+    if len(toreturn)>0 and (toreturn[-1] == "," or toreturn[-1] == "."):
         toreturn = toreturn[:-1].strip()
-    if toreturn[0] == "," or toreturn[0] == ".":
+    if len(toreturn)>0 and (toreturn[0] == "," or toreturn[0] == "."):
         toreturn = toreturn[1:].strip()
     return toreturn
 
@@ -143,7 +145,12 @@ def convert_to_rfc3339(date_str, debug=False):
             return parsed_date.isoformat()
     except ValueError:
         pass
-
+    
+    try:
+        return datetime.fromtimestamp(mktime_tz(parsedate_tz(date_str))).isoformat()
+    except ValueError:
+        pass
+    
     if(debug):
         return (f"Could not parse the date: {date_str}")
     return None
@@ -151,6 +158,9 @@ def convert_to_rfc3339(date_str, debug=False):
 def main():
     # Example usage with a list of date strings.
     date_formats = [
+        # "Tue, 01 Dic 2020 00:02:00 GMT",        # RFC 822 with timezone
+        "Sun, 4 Sep 2016 00:00:00 -0700 GMT",
+        "Tue, 19 Feb 2019 24:00:00 PST",       # RFC 822 with timezone
         "Sat, 18 Jun 2016 12:00:00 +0800",     # RFC 822 with timezone
         "Fri, 22 Mer 2019 10:00:00 +0900",     # RFC 822 with timezone
         "Thur, 2 Dec 2017 1:00:00 GMT",        # RFC 822 with timezone
